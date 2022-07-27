@@ -1,4 +1,3 @@
-
 import folium
 from django.http import HttpResponseNotFound
 from django.shortcuts import render
@@ -30,7 +29,7 @@ def add_pokemon(folium_map, lat, lon, image_url=DEFAULT_IMAGE_URL):
 def show_all_pokemons(request):
     pokemons = Pokemon.objects.all()
     active_pokemons_entities = PokemonEntity.objects.filter(appeared_at__lte=localtime(),
-                                                   disappeared_at__gte=localtime())
+                                                            disappeared_at__gte=localtime())
     folium_map = folium.Map(location=MOSCOW_CENTER, zoom_start=12)
     for pokemon in active_pokemons_entities:
         pokemons_entity_photo = request.build_absolute_uri(f'/media/{pokemon.pokemon.photo}')
@@ -56,28 +55,18 @@ def show_all_pokemons(request):
 
 
 def show_pokemon(request, pokemon_id):
-    pokemons = Pokemon.objects.all()
-
-    for pokemon in pokemons:
-        if pokemon.id == int(pokemon_id):
-            selected_pokemon = PokemonEntity.objects.filter(pokemon=pokemon)
-            break
-    else:
+    selected_pokemon = PokemonEntity.objects.filter(pokemon_id=pokemon_id)[0]
+    if not selected_pokemon:
         return HttpResponseNotFound('<h1>Такой покемон не найден</h1>')
 
     folium_map = folium.Map(location=MOSCOW_CENTER, zoom_start=12)
-    for pokemon_entity in selected_pokemon:
-        img_url = request.build_absolute_uri(f'/media/{pokemon_entity.pokemon.photo}')
-        add_pokemon(
-            folium_map, pokemon_entity.lat,
-            pokemon_entity.lon,
-            img_url
-        )
+    img_url = request.build_absolute_uri(f'/media/{selected_pokemon.pokemon.photo}')
+    add_pokemon(folium_map, selected_pokemon.lat, selected_pokemon.lon, img_url)
 
-    previous_evolution_img = request.build_absolute_uri(f'/media/{pokemon.previous_evolution.photo}')
+    previous_evolution_img = request.build_absolute_uri(f'/media/{selected_pokemon.pokemon.previous_evolution.photo}')
 
     next_evolution = ""
-    next_evolution_serialized = pokemon.pokemon_evolusions.all()
+    next_evolution_serialized = selected_pokemon.pokemon.pokemon_evolusions.all()
     if next_evolution_serialized:
         if len(next_evolution_serialized) > 1:
             next_evolution = next_evolution_serialized[1]
@@ -89,8 +78,9 @@ def show_pokemon(request, pokemon_id):
 
     return render(request, 'pokemon.html', context={
         'map': folium_map._repr_html_(),
-        'pokemon': {'title_ru': pokemon.title, 'img_url': img_url, "description": pokemon.description,
-                    "title_en": pokemon.title_en, "title_jp": pokemon.title_jp,
-                    "previous_evolution": pokemon.previous_evolution,
+        'pokemon': {'title_ru': selected_pokemon.pokemon.title, 'img_url': img_url,
+                    "description": selected_pokemon.pokemon.description,
+                    "title_en": selected_pokemon.pokemon.title_en, "title_jp": selected_pokemon.pokemon.title_jp,
+                    "previous_evolution": selected_pokemon.pokemon.previous_evolution,
                     'previous_evolution_img': previous_evolution_img, "next_evolution": next_evolution,
                     "next_evolution_img": next_evolution_img}})
