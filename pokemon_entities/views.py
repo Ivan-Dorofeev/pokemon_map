@@ -66,12 +66,12 @@ def show_pokemon(request, pokemon_id):
     previous_evolution_img = request.build_absolute_uri(f'/media/{selected_pokemon.pokemon.previous_evolution.photo}')
 
     next_evolution = ""
-    next_evolution_serialized = selected_pokemon.pokemon.pokemon_evolusions.all()
-    if next_evolution_serialized:
-        if len(next_evolution_serialized) > 1:
-            next_evolution = next_evolution_serialized[1]
+    selected_pokemon_evolutions = selected_pokemon.pokemon.pokemon_evolusions.all()
+    if selected_pokemon_evolutions:
+        if len(selected_pokemon_evolutions) > 1:
+            next_evolution = selected_pokemon_evolutions[1]
         else:
-            next_evolution = next_evolution_serialized[0]
+            next_evolution = selected_pokemon_evolutions[0]
         next_evolution_img = request.build_absolute_uri(f'/media/{next_evolution.photo}')
     else:
         next_evolution_img = ""
