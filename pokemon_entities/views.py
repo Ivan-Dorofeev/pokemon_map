@@ -77,7 +77,7 @@ def show_pokemon(request, pokemon_id):
     previous_evolution_img = request.build_absolute_uri(f'/media/{pokemon.previous_evolution.photo}')
 
     next_evolution = ""
-    next_evolution_serialized = pokemon.parent.all()
+    next_evolution_serialized = pokemon.pokemon_evolusions.all()
     if next_evolution_serialized:
         if len(next_evolution_serialized) > 1:
             next_evolution = next_evolution_serialized[1]
