@@ -1,9 +1,5 @@
-import datetime
 
 import folium
-import json
-
-import pytz
 from django.http import HttpResponseNotFound
 from django.shortcuts import render
 from django.utils.timezone import localtime
