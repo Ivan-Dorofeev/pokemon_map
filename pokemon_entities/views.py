@@ -55,18 +55,18 @@ def show_all_pokemons(request):
 
 
 def show_pokemon(request, pokemon_id):
-    selected_pokemon = PokemonEntity.objects.filter(pokemon_id=pokemon_id)[0]
-    if not selected_pokemon:
+    pokemon_entity = PokemonEntity.objects.filter(pokemon_id=pokemon_id)[0]
+    if not pokemon_entity:
         return HttpResponseNotFound('<h1>Такой покемон не найден</h1>')
 
     folium_map = folium.Map(location=MOSCOW_CENTER, zoom_start=12)
-    img_url = request.build_absolute_uri(f'/media/{selected_pokemon.pokemon.photo}')
-    add_pokemon(folium_map, selected_pokemon.lat, selected_pokemon.lon, img_url)
+    img_url = request.build_absolute_uri(f'/media/{pokemon_entity.pokemon.photo}')
+    add_pokemon(folium_map, pokemon_entity.lat, pokemon_entity.lon, img_url)
 
-    previous_evolution_img = request.build_absolute_uri(f'/media/{selected_pokemon.pokemon.previous_evolution.photo}')
+    previous_evolution_img = request.build_absolute_uri(f'/media/{pokemon_entity.pokemon.previous_evolution.photo}')
 
     next_evolution = ""
-    selected_pokemon_evolutions = selected_pokemon.pokemon.pokemon_evolusions.all()
+    selected_pokemon_evolutions = pokemon_entity.pokemon.pokemon_evolutions.all()
     if selected_pokemon_evolutions:
         next_evolution = selected_pokemon_evolutions.last()
         next_evolution_img = request.build_absolute_uri(f'/media/{next_evolution.photo}')
@@ -75,9 +75,9 @@ def show_pokemon(request, pokemon_id):
 
     return render(request, 'pokemon.html', context={
         'map': folium_map._repr_html_(),
-        'pokemon': {'title_ru': selected_pokemon.pokemon.title, 'img_url': img_url,
-                    "description": selected_pokemon.pokemon.description,
-                    "title_en": selected_pokemon.pokemon.title_en, "title_jp": selected_pokemon.pokemon.title_jp,
-                    "previous_evolution": selected_pokemon.pokemon.previous_evolution,
+        'pokemon': {'title_ru': pokemon_entity.pokemon.title, 'img_url': img_url,
+                    "description": pokemon_entity.pokemon.description,
+                    "title_en": pokemon_entity.pokemon.title_en, "title_jp": pokemon_entity.pokemon.title_jp,
+                    "previous_evolution": pokemon_entity.pokemon.previous_evolution,
                     'previous_evolution_img': previous_evolution_img, "next_evolution": next_evolution,
                     "next_evolution_img": next_evolution_img}})
