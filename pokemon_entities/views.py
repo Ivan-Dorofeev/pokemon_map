@@ -72,8 +72,6 @@ def show_pokemon(request, pokemon_id):
     if pokemon_evolutions:
         next_evolution = pokemon_evolutions.last()
         next_evolution_img = request.build_absolute_uri(f'/media/{next_evolution.photo}')
-    else:
-        next_evolution_img = ""
 
     return render(request, 'pokemon.html', context={
         'map': folium_map._repr_html_(),
