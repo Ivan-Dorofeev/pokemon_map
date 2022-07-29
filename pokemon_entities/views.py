@@ -55,9 +55,7 @@ def show_all_pokemons(request):
 
 
 def show_pokemon(request, pokemon_id):
-    get_list_or_404(Pokemon, id=pokemon_id)
-
-    pokemon_by_id = Pokemon.objects.filter(id=pokemon_id)[0]
+    pokemon_by_id = get_list_or_404(Pokemon, id=pokemon_id)[0]
 
     folium_map = folium.Map(location=MOSCOW_CENTER, zoom_start=12)
     img_url = request.build_absolute_uri(f'/media/{pokemon_by_id.photo}')
