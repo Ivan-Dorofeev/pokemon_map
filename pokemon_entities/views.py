@@ -1,6 +1,6 @@
 import folium
 from django.http import HttpResponseNotFound
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404, get_list_or_404
 from django.utils.timezone import localtime
 
 from pokemon_entities.models import Pokemon, PokemonEntity
@@ -55,10 +55,9 @@ def show_all_pokemons(request):
 
 
 def show_pokemon(request, pokemon_id):
+    get_list_or_404(Pokemon, id=pokemon_id)
+
     pokemon_by_id = Pokemon.objects.filter(id=pokemon_id)[0]
-    pokemon_entity = pokemon_by_id.entities.all()
-    if not pokemon_entity:
-        return HttpResponseNotFound('<h1>Такой покемон не найден</h1>')
 
     folium_map = folium.Map(location=MOSCOW_CENTER, zoom_start=12)
     img_url = request.build_absolute_uri(f'/media/{pokemon_by_id.photo}')
